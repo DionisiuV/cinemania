@@ -1,21 +1,24 @@
 package ro.valentin.cinemania.presentation.movies
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import ro.valentin.cinemania.databinding.MovieDataBinding
 import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.BR
 import ro.valentin.cinemania.R
+import ro.valentin.cinemania.core.Constants.LOG_TAG
 import kotlin.math.min
 
 class MoviesAdapter(
     private val movieList: List<Movie>,
-    private val onMovieClickListener: OnMovieClickListener
+    private val onMovieClickListener: OnMovieClickListener,
     ) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
-    private val limit = 5
     private lateinit var selectTimeAdapter: SelectTimeAdapter
     private lateinit var selectTimeList: List<String>
     private lateinit var selectTimeRecyclerView: RecyclerView
@@ -24,8 +27,6 @@ class MoviesAdapter(
         val layoutInflater = LayoutInflater.from(parent.context)
         val dataBinding = MovieDataBinding.inflate(layoutInflater, parent, false)
 
-
-
         //for testing
         //idk where to initiate and set second recyclerview
         selectTimeList = listOf(
@@ -33,9 +34,9 @@ class MoviesAdapter(
             "13:50",
             "18:90"
         )
-        selectTimeAdapter = SelectTimeAdapter(selectTimeList)
         selectTimeRecyclerView = dataBinding.timeRecyclerView
-        selectTimeRecyclerView.adapter = selectTimeAdapter
+
+
 
         return MovieViewHolder(dataBinding)
     }
@@ -50,9 +51,18 @@ class MoviesAdapter(
     override fun getItemCount() = movieList.size
 
     inner class MovieViewHolder(private val dataBinding: ViewDataBinding) : RecyclerView.ViewHolder(dataBinding.root) {
-        fun bind(movie: Movie?) {
+        fun bind(movie: Movie) {
             dataBinding.setVariable(BR.movie, movie)
             dataBinding.setVariable(BR.onMovieClickListener, onMovieClickListener)
+
+            //this is a good approach?
+            selectTimeAdapter = SelectTimeAdapter(selectTimeList) { time ->
+                Log.d(LOG_TAG, time)
+                Log.d(LOG_TAG, movie.title)
+            }
+            selectTimeRecyclerView.adapter = selectTimeAdapter
+            ////////////////////////////
+
         }
 
     }
