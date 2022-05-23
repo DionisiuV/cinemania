@@ -1,7 +1,10 @@
 package ro.valentin.cinemania.presentation.movies
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import ro.valentin.cinemania.domain.use_case.movie_db.MovieDbUseCases
 import javax.inject.Inject
 
@@ -9,5 +12,9 @@ import javax.inject.Inject
 class MoviesViewModel @Inject constructor(
     private val movieDbUseCases: MovieDbUseCases
 ) : ViewModel() {
-    fun getMovies() = movieDbUseCases.getMovies()
+    fun getMovies() = liveData(Dispatchers.IO) {
+        movieDbUseCases.getMovies().collectLatest {
+            emit(it)
+        }
+    }
 }

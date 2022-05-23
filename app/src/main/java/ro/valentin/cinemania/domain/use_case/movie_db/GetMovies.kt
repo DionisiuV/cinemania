@@ -9,9 +9,5 @@ import javax.inject.Inject
 class GetMovies @Inject constructor(
     private val movieDbRepository: MovieDbRepository
 ) {
-    operator fun invoke() = liveData(Dispatchers.IO) {
-        movieDbRepository.getMovies().collectLatest {
-            emit(it)
-        }
-    }
+    suspend operator fun invoke() = movieDbRepository.getMovies()
 }
