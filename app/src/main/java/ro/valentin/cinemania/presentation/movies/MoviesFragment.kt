@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
@@ -13,7 +14,6 @@ import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.data.network.dto.toMovie
 import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.domain.model.Response
-
 @AndroidEntryPoint
 class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovieClickListener {
     private val viewModel by viewModels<MoviesViewModel>()
@@ -27,8 +27,6 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
 
         initRecyclerView(view)
         getMovies()
-//        initMoviesAdapter()
-//        setMoviesAdapter()
     }
 
     private fun initRecyclerView(view: View) {
@@ -49,9 +47,6 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
                     movieList = response.data.movieDtoList.map { movieDto ->
                         movieDto.toMovie()
                     }
-
-                    //it is ok like that?
-                    //i want to set adapter and serve content to adapter only if i have it
                     initMoviesAdapter()
                     setMoviesAdapter()
                 }
@@ -66,6 +61,13 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
 
     override fun onMovieClick(movie: Movie) {
         Toast.makeText(context, movie.title, Toast.LENGTH_SHORT).show()
+        goToMovieFragment()
     }
+
+    private fun goToMovieFragment() {
+        findNavController().navigate(R.id.movieDetailsFragment)
+    }
+
+
 }
 
