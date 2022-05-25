@@ -10,8 +10,9 @@ data class MovieDto(
     @SerializedName("vote_average") val rating: Double,
     @SerializedName("release_date") val releaseDate: String,
     val popularity: Double,
-    @SerializedName("original_language") val originalLanguage: String
+    @SerializedName("original_language") val originalLanguage: String,
+    @SerializedName("overview") val description: String,
 )
 
-fun MovieDto.toMovie(): Movie = Movie(id, title, posterPath, releaseDate)
+fun MovieDto.toMovie(): Movie = Movie(id, title, posterPath, releaseDate, description, rating)
 
