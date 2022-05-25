@@ -61,11 +61,13 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
 
     override fun onMovieClick(movie: Movie) {
         Toast.makeText(context, movie.title, Toast.LENGTH_SHORT).show()
-        goToMovieFragment()
+        goToMovieFragment(movie.id)
     }
 
-    private fun goToMovieFragment() {
-        findNavController().navigate(R.id.movieDetailsFragment)
+    private fun goToMovieFragment(movieId: Int) {
+        val movieIdBundle = Bundle()
+        movieIdBundle.putInt("movieId", movieId)
+        findNavController().navigate(R.id.movieDetailsFragment, movieIdBundle)
     }
 
 

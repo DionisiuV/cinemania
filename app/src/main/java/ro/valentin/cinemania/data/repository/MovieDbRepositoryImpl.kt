@@ -20,4 +20,16 @@ class MovieDbRepositoryImpl @Inject constructor(
             emit(Response.Error(e.message ?: e.toString()))
         }
     }
+
+    override suspend fun getMovieDetails(movieId: Int) = flow {
+        try {
+            emit(Response.Loading)
+            val result = movieDbApi.getMovieDetails(movieId, API_KEY_VALUE).await()
+            emit(Response.Success(result))
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: e.toString()))
+        }
+    }
+
+
 }
