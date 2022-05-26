@@ -1,10 +1,12 @@
 package ro.valentin.cinemania.presentation.movie_details
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -16,13 +18,14 @@ import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.data.network.dto.toMovie
 import ro.valentin.cinemania.databinding.MovieDetailsDataBinding
 import ro.valentin.cinemania.domain.model.Response
+import ro.valentin.cinemania.domain.model.Seat
 
 @AndroidEntryPoint
-class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
+class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details), MovieDetailsAdapter.OnSeatClickListener {
     private lateinit var dataBinding: MovieDetailsDataBinding
     private lateinit var movieDetailsRecyclerView: RecyclerView
     private lateinit var movieDetailsAdapter: MovieDetailsAdapter
-    private lateinit var seats: List<String>
+    private lateinit var seats: List<Seat>
     private val viewModel by viewModels<MovieDetailsViewModel>()
 
     override fun onCreateView(
@@ -54,38 +57,38 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
 
     private fun initMovieDetailsAdapter() {
         seats = listOf(
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
-                "10",
-                "11",
-                "12",
-                "13",
-                "14",
-                "15",
-                "16",
-                "17",
-                "18",
-                "19",
-                "20",
-                "21",
-                "22",
-                "23",
-                "24",
-                "25",
-                "26",
-                "27",
-                "28",
-                "29",
-                "30",
-            )
-        movieDetailsAdapter = MovieDetailsAdapter(seats)
+            Seat(1, false),
+            Seat(2, false),
+            Seat(3, false),
+            Seat(4, false),
+            Seat(5, false),
+            Seat(6, false),
+            Seat(7, false),
+            Seat(8, false),
+            Seat(9, false),
+            Seat(10, false),
+            Seat(11, false),
+            Seat(12, false),
+            Seat(13, false),
+            Seat(14, false),
+            Seat(15, false),
+            Seat(16, false),
+            Seat(17, false),
+            Seat(18, false),
+            Seat(19, false),
+            Seat(20, false),
+            Seat(21, false),
+            Seat(22, false),
+            Seat(23, false),
+            Seat(24, false),
+            Seat(25, false),
+            Seat(26, false),
+            Seat(27, false),
+            Seat(28, false),
+            Seat(29, false),
+            Seat(30, false),
+        )
+        movieDetailsAdapter = MovieDetailsAdapter(seats, this)
     }
 
     private fun setMoviesAdapter() {
@@ -110,6 +113,18 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details) {
                 }
 
             }
+        }
+    }
+
+    override fun onSeatClick(seat: Seat, position: Int) {
+        Toast.makeText(context, "${seat.number} ${seat.available}", Toast.LENGTH_SHORT).show()
+        seat.available = !seat.available
+        if(seat.available) {
+            movieDetailsRecyclerView.layoutManager?.findViewByPosition(position)?.setBackgroundColor(
+                Color.parseColor("#FF0000"))
+        } else {
+            movieDetailsRecyclerView.layoutManager?.findViewByPosition(position)?.setBackgroundColor(
+                Color.parseColor("#000000"))
         }
     }
 }
