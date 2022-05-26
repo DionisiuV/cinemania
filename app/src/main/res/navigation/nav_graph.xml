@@ -8,13 +8,13 @@
     <fragment
         android:id="@+id/latestMovieFragment"
         android:name="ro.valentin.cinemania.presentation.movies.MoviesFragment"
-        android:label="list_of_movies"
+        android:label="Choose movie"
         tools:layout="@layout/fragment_movies" />
 
     <fragment
         android:id="@+id/movieDetailsFragment"
         android:name="ro.valentin.cinemania.presentation.movie_details.MovieDetailsFragment"
-        android:label="movie_details"
+        android:label="Choose seats"
         tools:layout="@layout/fragment_movie_details" />
 
 </navigation>

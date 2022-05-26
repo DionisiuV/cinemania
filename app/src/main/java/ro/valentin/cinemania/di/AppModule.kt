@@ -10,6 +10,7 @@ import ro.valentin.cinemania.core.Constants.BASE_URL
 import ro.valentin.cinemania.data.network.MovieDbApi
 import ro.valentin.cinemania.data.repository.MovieDbRepositoryImpl
 import ro.valentin.cinemania.domain.repository.MovieDbRepository
+import ro.valentin.cinemania.domain.use_case.movie_db.GetMovieDetails
 import ro.valentin.cinemania.domain.use_case.movie_db.GetMovies
 import ro.valentin.cinemania.domain.use_case.movie_db.MovieDbUseCases
 
@@ -35,6 +36,7 @@ class AppModule {
     fun provideMovieDbUseCases(
         movieDbRepository: MovieDbRepository
     ) : MovieDbUseCases = MovieDbUseCases(
-       getMovies = GetMovies(movieDbRepository)
+       getMovies = GetMovies(movieDbRepository),
+        getMovieDetails = GetMovieDetails(movieDbRepository)
     )
 }

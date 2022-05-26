@@ -15,7 +15,7 @@ interface MovieDbApi {
         @Query("api_key") apiKey: String
     ): Call<MoviesDto>
 
-    @GET("$MOVIE_DETAILS_URI{movieId}")
+    @GET("$MOVIE_DETAILS_URI/{movieId}")
     fun getMovieDetails(
         @Path("movieId") movieId: Int,
         @Query("api_key") apiKey: String

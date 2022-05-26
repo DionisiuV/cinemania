@@ -1,4 +1,4 @@
-package ro.valentin.cinemania.presentation.movies
+package ro.valentin.cinemania.presentation
 
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
@@ -8,7 +8,11 @@ import ro.valentin.cinemania.core.Constants.IMG_BASE_URL
 @BindingAdapter("android:posterPath")
 fun setPosterPathToImgView(posterImageView: ImageView, posterPath: String?) {
     posterPath?.let {
-        Glide.with(posterImageView.context).load("$IMG_BASE_URL$posterPath").into(posterImageView)
+        Glide
+            .with(posterImageView.context)
+            .load("$IMG_BASE_URL$posterPath")
+            .centerCrop()
+            .into(posterImageView)
     }
 
 }

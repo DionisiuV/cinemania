@@ -2,6 +2,7 @@ package ro.valentin.cinemania.presentation.movies
 
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -12,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.data.network.dto.toMovie
+import ro.valentin.cinemania.databinding.MovieDataBinding
 import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.domain.model.Response
 @AndroidEntryPoint
