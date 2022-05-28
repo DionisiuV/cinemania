@@ -1,4 +1,4 @@
-package ro.valentin.cinemania.domain.use_case.movie_db
+package ro.valentin.cinemania.domain.use_case.movieDb
 
 data class MovieDbUseCases(
     val getMovies: GetMovies,

@@ -67,6 +67,7 @@ dependencies {
     implementation platform("com.google.firebase:firebase-bom:$firebase_boom_version")
     implementation "com.google.firebase:firebase-auth-ktx"
     implementation "com.google.firebase:firebase-firestore-ktx"
+    implementation 'com.google.firebase:firebase-database'
     //Google play services
     implementation "com.google.android.gms:play-services-auth:$google_play_services_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_play_services"

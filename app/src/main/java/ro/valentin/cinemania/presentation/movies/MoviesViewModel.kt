@@ -5,7 +5,7 @@ import androidx.lifecycle.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import ro.valentin.cinemania.domain.use_case.movie_db.MovieDbUseCases
+import ro.valentin.cinemania.domain.use_case.movieDb.MovieDbUseCases
 import javax.inject.Inject
 
 @HiltViewModel
