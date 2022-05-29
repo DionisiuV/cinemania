@@ -12,6 +12,7 @@ import javax.inject.Inject
 class MoviesViewModel @Inject constructor(
     private val movieDbUseCases: MovieDbUseCases
 ) : ViewModel() {
+
     fun getMovies() = liveData(Dispatchers.IO) {
         movieDbUseCases.getMovies().collectLatest {
             emit(it)

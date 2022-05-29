@@ -1,6 +1,5 @@
 package ro.valentin.cinemania.presentation.movie_details
 
-import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +10,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.*
+import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.Query
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.BR
 import ro.valentin.cinemania.R
@@ -21,19 +22,18 @@ import ro.valentin.cinemania.databinding.MovieDetailsDataBinding
 import ro.valentin.cinemania.domain.model.Response
 import ro.valentin.cinemania.domain.model.Seat
 import ro.valentin.cinemania.domain.model.getSeats
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details), MovieDetailsAdapter.OnSeatClickListener {
-    private lateinit var dataBinding: MovieDetailsDataBinding
-    private lateinit var movieDetailsRecyclerView: RecyclerView
-    private lateinit var movieDetailsAdapter: MovieDetailsAdapter
-    private var seats = getSeats()
-    private var movieId: Int? = null
+class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
+    MovieDetailsAdapter.OnSeatClickListener {
+    private val viewModel by viewModels<MovieDetailsViewModel>()
     @Inject
     lateinit var dbRef: FirebaseDatabase
-    private val viewModel by viewModels<MovieDetailsViewModel>()
+    private lateinit var dataBinding: MovieDetailsDataBinding
+    private lateinit var movieDetailsAdapter: MovieDetailsAdapter
+    private lateinit var seats: MutableList<Seat>
+    private var movieId: Int? = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,60 +41,48 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details), MovieDet
         savedInstanceState: Bundle?
     ): View {
         dataBinding = MovieDetailsDataBinding.inflate(inflater, container, false)
-
         return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        seats = getSeats()
         movieId = getMovieIdFromBundle()
 
-
-        //todo, implement lastUpdate: sessionId and update on click only if sessionId from last update == sessionId from user
-//        val randomUUID = UUID.randomUUID().toString()
-//        dbRef.getReference("seats").child(movieId.toString()).child("sessionID").setValue(randomUUID)
-
-        dbRef.getReference("seats").child(movieId.toString()).addValueEventListener(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                fetchSeatsDetails()
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-            }
-        })
-
-        initRecyclerView(view)
-        initMovieDetailsAdapter()
-        setMoviesAdapter()
+        //fetch movie details from api
         getMovieDetails(movieId)
+
+        //check if movie exist in db, if not add and create list of seat
         fetchSeatsDetails()
+
+        //find recyclerView and attach adapter
+        setRecyclerView(view)
     }
 
-    private fun initRecyclerView(view: View) {
-        movieDetailsRecyclerView = view.findViewById(R.id.seatsRecyclerView)
+    private fun setRecyclerView(view: View) {
+        val movieDetailsRecyclerView: RecyclerView = view.findViewById(R.id.seatsRecyclerView)
+        val query: Query = dbRef.getReference("seats").child(movieId.toString())
+        val firebaseRecyclerOptions: FirebaseRecyclerOptions<Seat> =
+            FirebaseRecyclerOptions.Builder<Seat>()
+                .setQuery(query, Seat::class.java)
+                .build()
+
+        movieDetailsAdapter = MovieDetailsAdapter(this, firebaseRecyclerOptions)
+
         movieDetailsRecyclerView.layoutManager = GridLayoutManager(view.context, 6)
-    }
-
-   private fun initMovieDetailsAdapter() {
-        Log.d(LOG_TAG, "init moviedetails adapter")
-        movieDetailsAdapter = MovieDetailsAdapter(seats, this)
-    }
-
-    private fun setMoviesAdapter() {
         movieDetailsRecyclerView.adapter = movieDetailsAdapter
     }
-
 
     private fun getMovieIdFromBundle() = arguments?.getInt("movieId")
 
     private fun getMovieDetails(movieId: Int?) {
-
-
         if (movieId != null) {
             viewModel.getMovieDetail(movieId).observe(viewLifecycleOwner) { response ->
-                when(response) {
-                    is Response.Loading -> Log.d(LOG_TAG, "movie data is loading")
-                    is Response.Success ->{
+                when (response) {
+                    is Response.Loading -> {
+                        Log.d(LOG_TAG, "movie data is loading")
+                    }
+                    is Response.Success -> {
                         val movie = response.data.toMovie()
                         dataBinding.setVariable(BR.movie, movie)
                     }
@@ -104,60 +92,66 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details), MovieDet
         }
     }
 
+    //on seat click check if is available or not
+    //if it's available, mark as unavailable and update lastUpdate field with user id
+    //if it's unavailable and only if lastUpdate field == userId mark as available, otherwise display err msg
     override fun onSeatClick(seat: Seat, position: Int) {
-        if(!seats[position].available) {
-            Toast.makeText(context, "Not available", Toast.LENGTH_LONG).show()
+        if (!seat.available) {
+            //seat unavailable, check if lastUpdate field from DB == currentUser id
+            //if yes, mark as available
+                //TODO: check currentUserId == lastUpdate field from db
+            //if not
+            Toast.makeText(context, "Already taken", Toast.LENGTH_LONG).show()
         } else {
-            seats[position].available = !seats[position].available
-            updateSeats(seats[position])
+            //seat available, mark as unavailable
+            seat.available = !seat.available
+            updateSeat(seat)
         }
-
     }
 
-    private fun updateSeats(seat: Seat) {
-        dbRef.getReference("seats").child(movieId.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if(snapshot.exists()) {
-                    Log.d(LOG_TAG, "data exists, need to update")
-                    val map = mutableMapOf<String, Any>()
-                    map["available"] = seat.available
-                    dbRef.getReference("seats").child(movieId.toString()).child(seat.number!!).updateChildren(map)
-                    Log.d(LOG_TAG, "Data updated, need to update UI")
-                } else {
-                    Log.d(LOG_TAG, "no data, need to save it")
-                    dbRef.getReference("seats").child(movieId.toString()).setValue(seats)
-                    Log.d(LOG_TAG, "Data saved, need to update UI")
-                }
-
-            }
-            override fun onCancelled(error: DatabaseError) {
-                Log.d(LOG_TAG, "error: ${error.message}")
-            }
-        })
+    private fun updateSeat(seat: Seat) {
+        val map = mutableMapOf<String, Any>()
+        map["available"] = seat.available
+        dbRef.getReference("seats").child(movieId.toString()).child(seat.number!!)
+            .updateChildren(map)
     }
 
     private fun fetchSeatsDetails() {
-        Log.d(LOG_TAG, movieId.toString())
-
-        if(view != null) {
+        if (view != null) {
             movieId?.let { viewModel.getSeats(it) }?.observe(viewLifecycleOwner) { response ->
-                when(response) {
-                    is Response.Loading -> Log.d(LOG_TAG, "is loading from rtdb")
-                    is Response.Success ->{
-
-                        if(response.data.isNotEmpty()) {
-                            seats.clear()
-                            seats.addAll(response.data as MutableList<Seat>)
-
-                            movieDetailsAdapter.notifyDataSetChanged()
+                when (response) {
+                    is Response.Loading -> {
+                        //show progressBar
+                        Log.d(LOG_TAG, "getSeatDetails() request is loading")
+                    }
+                    is Response.Success -> {
+                        if (response.data.isNotEmpty()) {
+                            //hide progressBar
+                            Log.d(LOG_TAG, "data is there")
+                        } else {
+                            Log.d(LOG_TAG, "data is not there, need to push it")
+                            dbRef.getReference("seats").child(movieId.toString()).setValue(seats)
+                            Log.d(LOG_TAG, "data pushed")
+                            //hide progressBar
                         }
                     }
-                    is Response.Error -> Log.d(LOG_TAG, response.error)
+                    is Response.Error -> {
+                        //display error
+                        Log.d(LOG_TAG, response.error)
+                    }
                 }
             }
         }
-        }
+    }
 
 
+    override fun onStart() {
+        super.onStart()
+        movieDetailsAdapter.startListening()
+    }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        movieDetailsAdapter.stopListening()
+    }
 }

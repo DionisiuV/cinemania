@@ -1,6 +1,5 @@
 package ro.valentin.cinemania.data.repository
 
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.flow.flow
 import retrofit2.await
 import ro.valentin.cinemania.core.Constants.API_KEY_VALUE
@@ -12,6 +11,7 @@ import javax.inject.Inject
 class MovieDbRepositoryImpl @Inject constructor(
     private val movieDbApi: MovieDbApi
 ) : MovieDbRepository {
+
     override suspend fun getMovies() = flow {
         try {
             emit(Response.Loading)
@@ -31,6 +31,4 @@ class MovieDbRepositoryImpl @Inject constructor(
             emit(Response.Error(e.message ?: e.toString()))
         }
     }
-
-
 }

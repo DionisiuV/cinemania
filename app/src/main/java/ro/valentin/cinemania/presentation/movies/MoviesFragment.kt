@@ -16,6 +16,7 @@ import ro.valentin.cinemania.data.network.dto.toMovie
 import ro.valentin.cinemania.databinding.MovieDataBinding
 import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.domain.model.Response
+
 @AndroidEntryPoint
 class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovieClickListener {
     private val viewModel by viewModels<MoviesViewModel>()
@@ -44,7 +45,7 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
     private fun getMovies() {
         viewModel.getMovies().observe(viewLifecycleOwner) { response ->
             when(response) {
-                is Response.Loading -> Log.d(LOG_TAG, "is loading")
+                is Response.Loading -> Log.d(LOG_TAG, "movies request is loading")
                 is Response.Success ->{
                     movieList = response.data.movieDtoList.map { movieDto ->
                         movieDto.toMovie()
@@ -71,7 +72,5 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
         movieIdBundle.putInt("movieId", movieId)
         findNavController().navigate(R.id.movieDetailsFragment, movieIdBundle)
     }
-
-
 }
 

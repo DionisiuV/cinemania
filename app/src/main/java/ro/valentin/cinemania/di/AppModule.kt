@@ -62,5 +62,4 @@ class AppModule {
     ) : FirebaseDatabaseUseCases = FirebaseDatabaseUseCases(
         getSeats = GetSeats(firebaseDatabaseRepository)
     )
-
 }
