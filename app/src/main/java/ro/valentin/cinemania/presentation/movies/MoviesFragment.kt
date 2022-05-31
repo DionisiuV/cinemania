@@ -1,5 +1,6 @@
 package ro.valentin.cinemania.presentation.movies
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,6 +17,7 @@ import ro.valentin.cinemania.data.network.dto.toMovie
 import ro.valentin.cinemania.databinding.MovieDataBinding
 import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.domain.model.Response
+import ro.valentin.cinemania.presentation.splash.SplashActivity
 
 @AndroidEntryPoint
 class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovieClickListener {
@@ -64,13 +66,20 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
 
     override fun onMovieClick(movie: Movie) {
         Toast.makeText(context, movie.title, Toast.LENGTH_SHORT).show()
-        goToMovieFragment(movie.id)
+        goToSplashActivity(movie.id)
     }
 
-    private fun goToMovieFragment(movieId: Int) {
+/*    private fun goToMovieFragment(movieId: Int) {
         val movieIdBundle = Bundle()
         movieIdBundle.putInt("movieId", movieId)
         findNavController().navigate(R.id.movieDetailsFragment, movieIdBundle)
+    }*/
+
+    private fun goToSplashActivity(movieId: Int) {
+        val splashActivityIntent = Intent(context, SplashActivity::class.java)
+        splashActivityIntent.putExtra("movieId", movieId)
+
+        startActivity(splashActivityIntent)
     }
 }
 
