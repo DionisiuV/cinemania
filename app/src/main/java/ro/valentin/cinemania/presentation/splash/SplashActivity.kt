@@ -6,10 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavHost
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants
 import ro.valentin.cinemania.presentation.auth.AuthActivity
+import ro.valentin.cinemania.presentation.main.MainActivity
 import ro.valentin.cinemania.presentation.movie_details.MovieDetailsFragment
 import java.util.*
 import kotlin.concurrent.schedule
@@ -40,14 +45,13 @@ class SplashActivity: AppCompatActivity(R.layout.activity_splash) {
     }
 
     private fun goToMovieFragment(movieId: Int) {
-
-        val movieDetailsIntent = Intent(this, MovieDetailsFragment::class.java)
-        movieDetailsIntent.putExtra("movieId", movieId)
-
         Log.d(Constants.LOG_TAG, "from goToMovieFragment() movieId = $movieId")
+//        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment).navController
+//        val movieDetailsBundle = Bundle()
+//
+//        movieDetailsBundle.putInt("movieId", movieId)
 
-        startActivity(movieDetailsIntent)
-        finish()
+//        navController.navigate(R.id.movieDetailsFragment, movieDetailsBundle)
     }
 
 

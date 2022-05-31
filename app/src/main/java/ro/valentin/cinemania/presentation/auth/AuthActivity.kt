@@ -9,6 +9,9 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.android.gms.common.SignInButton
 import com.google.firebase.auth.AuthCredential
@@ -20,7 +23,9 @@ import ro.valentin.cinemania.core.Constants.SIGN_IN_ERROR_MSG
 import ro.valentin.cinemania.core.Utils.Companion.hide
 import ro.valentin.cinemania.core.Utils.Companion.show
 import ro.valentin.cinemania.domain.model.Response
+import ro.valentin.cinemania.presentation.main.MainActivity
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
@@ -102,15 +107,17 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                     loaderProgressBar.show()
                 }
                 is Response.Success -> {
-                    Log.d(LOG_TAG, "oneTapSignUp() success")
-                    val intent = response.data
-                    val intentSender = intent.pendingIntent.intentSender
+                    Log.d(LOG_TAG, "from oneTapSignUp() success")
+                    val intentAuth = response.data
+                    val intentSender = intentAuth.pendingIntent.intentSender
                     val request = IntentSenderRequest.Builder(intentSender).build()
 
                     //send request to launcher
                     resultActivityLauncher.launch(request)
 
                     loaderProgressBar.hide()
+
+                        intent.extras?.let { goToMovieFragment(it.getInt("movieId")) }
                 }
                 is Response.Error -> {
                     loaderProgressBar.hide()
@@ -144,10 +151,9 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
     }
 
     private fun goToMovieFragment(movieId: Int) {
-        val movieIdBundle = Bundle()
-        movieIdBundle.putInt("movieId", movieId)
+        Log.d(LOG_TAG, "from goToMovieFragment() movieId = $movieId")
+        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment).navController
 
-        Log.d(LOG_TAG, "movieId = $movieId")
-
+        navController.navigate(R.id.movieDetailsFragment)
     }
 }
