@@ -24,6 +24,7 @@ import ro.valentin.cinemania.data.repository.MovieDbRepositoryImpl
 import ro.valentin.cinemania.domain.repository.AuthRepository
 import ro.valentin.cinemania.domain.repository.FirebaseDatabaseRepository
 import ro.valentin.cinemania.domain.repository.MovieDbRepository
+import ro.valentin.cinemania.domain.use_case.firebase_auth.*
 import ro.valentin.cinemania.domain.use_case.firebase_database.FirebaseDatabaseUseCases
 import ro.valentin.cinemania.domain.use_case.firebase_database.GetSeats
 import ro.valentin.cinemania.domain.use_case.movieDb.GetMovieDetails
@@ -120,5 +121,17 @@ class AppModule {
         oneTapClient = oneTapClient,
         beginSignInRequest = beginSignInRequest,
         beginSignUpRequest = beginSignUpRequest
+    )
+
+    @Provides
+    fun provideFirebaseAuthUseCases(
+        authRepository: AuthRepository
+    ): FirebaseAuthUseCases = FirebaseAuthUseCases(
+        isUserAuthenticatedInFirebase = IsUserAuthenticatedInFirebase(authRepository),
+        oneTapSignInGoogle = OneTapSignInGoogle(authRepository),
+        oneTapSignUpGoogle = OneTapSignUpGoogle(authRepository),
+        firebaseSignOut = FirebaseSignOut(authRepository),
+        firebaseSignInWithGoogle = FirebaseSignInWithGoogle(authRepository),
+        authStateListener = AuthStateListener(authRepository),
     )
 }

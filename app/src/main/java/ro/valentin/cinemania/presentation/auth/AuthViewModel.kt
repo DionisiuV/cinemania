@@ -6,38 +6,39 @@ import com.google.firebase.auth.AuthCredential
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import ro.valentin.cinemania.domain.repository.AuthRepository
+import ro.valentin.cinemania.domain.use_case.firebase_auth.FirebaseAuthUseCases
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authUseCases: FirebaseAuthUseCases
 ): ViewModel() {
     fun signIn() = liveData(Dispatchers.IO) {
-        authRepository.oneTapSignInGoogle().collect {
+        authUseCases.oneTapSignInGoogle().collect {
             emit(it)
         }
     }
 
     fun signUp() = liveData(Dispatchers.IO) {
-        authRepository.oneTapSignUpGoogle().collect {
+        authUseCases.oneTapSignUpGoogle().collect {
             emit(it)
         }
     }
 
     fun signInWithGoogle(authCredential: AuthCredential) = liveData(Dispatchers.IO) {
-        authRepository.firebaseSignInWithGoogle(authCredential).collect {
+        authUseCases.firebaseSignInWithGoogle(authCredential).collect {
             emit(it)
         }
     }
 
     fun firebaseSignOut() = liveData(Dispatchers.IO) {
-        authRepository.firebaseSignOut().collect {
+        authUseCases.firebaseSignOut().collect {
             emit(it)
         }
     }
 
     fun authStateListener() = liveData(Dispatchers.IO) {
-        authRepository.authStateListener().collect {
+        authUseCases.authStateListener().collect {
             emit(it)
         }
     }

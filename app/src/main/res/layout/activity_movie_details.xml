@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<fragment
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_host_fragment_container"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".presentation.movie_details.MovieDetailsActivity">
+
+<fragment
+    android:id="@+id/nav_host_fragment_container_movie_details"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:defaultNavHost="true"
     app:navGraph="@navigation/nav_graph_movie"
     android:name="androidx.navigation.fragment.NavHostFragment" />
+
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        tools:visibility="visible"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+

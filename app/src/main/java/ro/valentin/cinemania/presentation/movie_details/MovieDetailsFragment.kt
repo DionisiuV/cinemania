@@ -42,11 +42,15 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         savedInstanceState: Bundle?
     ): View {
         dataBinding = MovieDetailsDataBinding.inflate(inflater, container, false)
+
+
         return dataBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
         seats = getSeats()
         movieId = getMovieIdFromIntent()
 
