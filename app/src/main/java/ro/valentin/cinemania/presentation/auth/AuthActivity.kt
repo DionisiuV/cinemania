@@ -95,7 +95,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                         oneTapSignUpWithGoogle()
                     }
 
-                    Log.d(LOG_TAG, "Signup error ${response.error}")
+                    Log.d(LOG_TAG, "oneTapSignInWithGoogle() error ${response.error}")
                 }
             }
 
@@ -111,8 +111,8 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                 }
                 is Response.Success -> {
                     Log.d(LOG_TAG, "from oneTapSignUp() success")
-                    val intentAuth = response.data
-                    val intentSender = intentAuth.pendingIntent.intentSender
+                    val intent = response.data
+                    val intentSender = intent.pendingIntent.intentSender
                     val request = IntentSenderRequest.Builder(intentSender).build()
 
                     //send request to launcher
@@ -120,12 +120,13 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
 
                     loaderProgressBar.hide()
 
-                        intent.extras?.let { goToMovieDetails(it.getInt("movieId")) }
+                    goToMovieDetails(this.intent.getIntExtra("movieId", 0))
+
                 }
                 is Response.Error -> {
                     loaderProgressBar.hide()
 
-                    Log.d(LOG_TAG, response.error)
+                    Log.d(LOG_TAG, "oneTapSignUpWithGoogle() error ${response.error}")
                 }
             }
 
@@ -147,7 +148,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                 }
                 is Response.Error -> {
                     loaderProgressBar.hide()
-                    Log.d(LOG_TAG, response.error)
+                    Log.d(LOG_TAG, "Error signInWithGoogle() ${response.error}")
                 }
             }
         }

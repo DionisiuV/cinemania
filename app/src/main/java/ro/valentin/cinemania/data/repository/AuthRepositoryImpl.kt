@@ -71,6 +71,8 @@ class AuthRepositoryImpl
     override fun authStateListener() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener {
             trySend(it.currentUser == null)
+
+            Log.d(LOG_TAG, "authStateListener() ${it.currentUser?.email}")
         }
         firebaseAuth.addAuthStateListener(authStateListener)
         awaitClose {

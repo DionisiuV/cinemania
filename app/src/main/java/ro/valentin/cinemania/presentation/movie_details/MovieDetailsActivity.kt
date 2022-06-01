@@ -33,6 +33,8 @@ class MovieDetailsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_movie_details)
 
+        Log.d(LOG_TAG, "MovieDetailsActivity reached")
+
         setNavController()
         initProgressBar()
         getAuthState()
@@ -93,6 +95,16 @@ class MovieDetailsActivity : AppCompatActivity() {
         Log.d(LOG_TAG, "from goToAuthActivity() movieId = $movieId")
 
         startActivity(authIntent)
+        finish()
+    }
+
+    private fun goToMovieDetails(movieId: Int) {
+        val movieDetailsIntent = Intent(this, MovieDetailsActivity::class.java)
+        movieDetailsIntent.putExtra("movieId", movieId)
+
+        Log.d(Constants.LOG_TAG, "from goToMovieDetails() movieId = $movieId")
+
+        startActivity(movieDetailsIntent)
         finish()
     }
 

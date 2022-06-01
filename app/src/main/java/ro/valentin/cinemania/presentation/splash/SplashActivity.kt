@@ -33,11 +33,11 @@ class SplashActivity: AppCompatActivity(R.layout.activity_splash) {
 
     private fun checkIfUserIsAuthenticated() {
         if(splashViewModel.isUserAuthenticated) {
-            Timer().schedule(2000) {
+            Timer().schedule(1000) {
                 goToMovieDetails(idMovie)
             }
         } else {
-            Timer().schedule(2000) {
+            Timer().schedule(1000) {
                 goToAuthActivity(idMovie)
             }
         }
