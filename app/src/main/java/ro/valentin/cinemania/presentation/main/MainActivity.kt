@@ -10,21 +10,9 @@ import ro.valentin.cinemania.R
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        initNavController()
-    }
-
-    private fun initNavController() {
-        navController = findNavController(R.id.nav_host_fragment_container)
-        setupActionBarWithNavController(navController)
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

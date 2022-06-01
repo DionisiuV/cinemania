@@ -6,16 +6,15 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavHost
-import androidx.navigation.Navigation
-import androidx.navigation.findNavController
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants
 import ro.valentin.cinemania.presentation.auth.AuthActivity
-import ro.valentin.cinemania.presentation.main.MainActivity
+import ro.valentin.cinemania.presentation.movie_details.MovieDetailsActivity
 import ro.valentin.cinemania.presentation.movie_details.MovieDetailsFragment
+import ro.valentin.cinemania.presentation.movies.MoviesFragment
 import java.util.*
 import kotlin.concurrent.schedule
 
@@ -35,7 +34,7 @@ class SplashActivity: AppCompatActivity(R.layout.activity_splash) {
     private fun checkIfUserIsAuthenticated() {
         if(splashViewModel.isUserAuthenticated) {
             Timer().schedule(2000) {
-                goToMovieFragment(idMovie)
+                goToMovieDetails(idMovie)
             }
         } else {
             Timer().schedule(2000) {
@@ -44,14 +43,14 @@ class SplashActivity: AppCompatActivity(R.layout.activity_splash) {
         }
     }
 
-    private fun goToMovieFragment(movieId: Int) {
-        Log.d(Constants.LOG_TAG, "from goToMovieFragment() movieId = $movieId")
-//        val navController = (supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container) as NavHostFragment).navController
-//        val movieDetailsBundle = Bundle()
-//
-//        movieDetailsBundle.putInt("movieId", movieId)
+    private fun goToMovieDetails(movieId: Int) {
+        val movieDetailsIntent = Intent(this, MovieDetailsActivity::class.java)
+        movieDetailsIntent.putExtra("movieId", movieId)
 
-//        navController.navigate(R.id.movieDetailsFragment, movieDetailsBundle)
+        Log.d(Constants.LOG_TAG, "from goToMovieDetails() movieId = $movieId")
+
+        startActivity(movieDetailsIntent)
+        finish()
     }
 
 
@@ -64,4 +63,6 @@ class SplashActivity: AppCompatActivity(R.layout.activity_splash) {
         startActivity(authIntent)
         finish()
     }
+
+
 }

@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.Query
 import dagger.hilt.android.AndroidEntryPoint
@@ -47,7 +48,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         seats = getSeats()
-        movieId = getMovieIdFromBundle()
+        movieId = getMovieIdFromIntent()
 
         //fetch movie details from api
         getMovieDetails(movieId)
@@ -73,7 +74,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         movieDetailsRecyclerView.adapter = movieDetailsAdapter
     }
 
-    private fun getMovieIdFromBundle() = arguments?.getInt("movieId")
+    private fun getMovieIdFromIntent() = activity?.intent?.getIntExtra("movieId", 0)
 
     private fun getMovieDetails(movieId: Int?) {
         if (movieId != null) {

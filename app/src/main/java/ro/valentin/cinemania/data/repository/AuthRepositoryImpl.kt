@@ -1,5 +1,6 @@
 package ro.valentin.cinemania.data.repository
 
+import android.util.Log
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.AuthCredential
@@ -8,6 +9,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.domain.model.Response
 import ro.valentin.cinemania.domain.repository.AuthRepository
 import javax.inject.Inject
@@ -23,6 +25,7 @@ class AuthRepositoryImpl
     @Named("signUpRequest") private val beginSignUpRequest: BeginSignInRequest
 ): AuthRepository {
     override fun isUserAuthenticatedInFirebase(): Boolean = firebaseAuth.currentUser != null
+
 
     override suspend fun oneTapSignInGoogle() = flow {
         try {
