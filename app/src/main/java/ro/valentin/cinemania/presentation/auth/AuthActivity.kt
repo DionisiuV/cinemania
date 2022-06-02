@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.identity.SignInCredential
 import com.google.android.gms.common.SignInButton
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
@@ -36,7 +37,6 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
     private lateinit var resultActivityLauncher: ActivityResultLauncher<IntentSenderRequest>
     private lateinit var loaderProgressBar: ProgressBar
     @Inject
-
     lateinit var oneTapClient: SignInClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +98,6 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                     Log.d(LOG_TAG, "oneTapSignInWithGoogle() error ${response.error}")
                 }
             }
-
         }
     }
 
@@ -110,14 +109,11 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                     loaderProgressBar.show()
                 }
                 is Response.Success -> {
-                    Log.d(LOG_TAG, "from oneTapSignUp() success")
                     val intent = response.data
                     val intentSender = intent.pendingIntent.intentSender
                     val request = IntentSenderRequest.Builder(intentSender).build()
-
                     //send request to launcher
                     resultActivityLauncher.launch(request)
-
                     loaderProgressBar.hide()
 
                     goToMovieDetails(this.intent.getIntExtra("movieId", 0))
@@ -143,6 +139,7 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                 is Response.Success -> {
                     loaderProgressBar.hide()
                     if(response.data) {
+                        Log.d(LOG_TAG, "signInWithGoogle() data ${response}")
                         intent.extras?.let { goToMovieDetails(it.getInt("movieId")) }
                     }
                 }

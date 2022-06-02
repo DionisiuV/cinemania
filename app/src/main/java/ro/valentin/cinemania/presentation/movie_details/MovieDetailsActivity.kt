@@ -8,11 +8,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.ProgressBar
 import androidx.activity.viewModels
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.auth.AdditionalUserInfo
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants
@@ -22,12 +25,12 @@ import ro.valentin.cinemania.core.Utils.Companion.show
 import ro.valentin.cinemania.domain.model.Response
 import ro.valentin.cinemania.presentation.auth.AuthActivity
 import ro.valentin.cinemania.presentation.auth.AuthViewModel
-
 @AndroidEntryPoint
 class MovieDetailsActivity : AppCompatActivity() {
     private lateinit var loaderProgressBar: ProgressBar
     private val viewModel by viewModels<AuthViewModel>()
     private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -98,16 +101,6 @@ class MovieDetailsActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun goToMovieDetails(movieId: Int) {
-        val movieDetailsIntent = Intent(this, MovieDetailsActivity::class.java)
-        movieDetailsIntent.putExtra("movieId", movieId)
-
-        Log.d(Constants.LOG_TAG, "from goToMovieDetails() movieId = $movieId")
-
-        startActivity(movieDetailsIntent)
-        finish()
-    }
-
     private fun setNavController() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container_movie_details) as NavHostFragment
         navController = navHostFragment.navController
@@ -117,4 +110,7 @@ class MovieDetailsActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
+
+
+
 }

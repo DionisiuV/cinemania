@@ -6,5 +6,6 @@ data class FirebaseAuthUseCases(
     val oneTapSignUpGoogle: OneTapSignUpGoogle,
     val firebaseSignInWithGoogle: FirebaseSignInWithGoogle,
     val firebaseSignOut: FirebaseSignOut,
-    val authStateListener: AuthStateListener
+    val authStateListener: AuthStateListener,
+    val getCurrentUser: GetCurrentUser
 )

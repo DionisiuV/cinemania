@@ -3,8 +3,10 @@ package ro.valentin.cinemania.data.repository
 import android.util.Log
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.android.gms.auth.api.identity.SignInCredential
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
@@ -25,6 +27,8 @@ class AuthRepositoryImpl
     @Named("signUpRequest") private val beginSignUpRequest: BeginSignInRequest
 ): AuthRepository {
     override fun isUserAuthenticatedInFirebase(): Boolean = firebaseAuth.currentUser != null
+
+    override fun getCurrentUser(): FirebaseUser?  = firebaseAuth.currentUser
 
 
     override suspend fun oneTapSignInGoogle() = flow {
@@ -71,8 +75,6 @@ class AuthRepositoryImpl
     override fun authStateListener() = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener {
             trySend(it.currentUser == null)
-
-            Log.d(LOG_TAG, "authStateListener() ${it.currentUser?.email}")
         }
         firebaseAuth.addAuthStateListener(authStateListener)
         awaitClose {

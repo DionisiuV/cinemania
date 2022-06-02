@@ -133,5 +133,6 @@ class AppModule {
         firebaseSignOut = FirebaseSignOut(authRepository),
         firebaseSignInWithGoogle = FirebaseSignInWithGoogle(authRepository),
         authStateListener = AuthStateListener(authRepository),
+        getCurrentUser = GetCurrentUser(authRepository)
     )
 }

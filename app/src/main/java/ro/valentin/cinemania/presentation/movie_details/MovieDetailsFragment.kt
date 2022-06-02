@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.Query
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.*
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.BR
 import ro.valentin.cinemania.R
@@ -35,6 +35,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private lateinit var movieDetailsAdapter: MovieDetailsAdapter
     private lateinit var seats: MutableList<Seat>
     private var movieId: Int? = 0
+    private lateinit var user: FirebaseUser
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,10 +50,14 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
         seats = getSeats()
         movieId = getMovieIdFromIntent()
+        user = getCurrentUser()!!
+
+        Log.d(LOG_TAG, user.email.toString())
+
+        //if currentUser does not exists in db add It
+        checkAndAddUserToDb()
 
         //fetch movie details from api
         getMovieDetails(movieId)
@@ -104,9 +109,27 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         if (!seat.available) {
             //seat unavailable, check if lastUpdate field from DB == currentUser id
             //if yes, mark as available
-                //TODO: check currentUserId == lastUpdate field from db
+            Log.d(LOG_TAG, "onSeatClick() ${user.uid}")
+            dbRef.getReference("seats").child(movieId.toString()).child(seat.number.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                    val lastUpdateIdFromDb = snapshot.child("lastUpdate").value.toString()
+
+                    if(user.uid == lastUpdateIdFromDb) {
+                        seat.available = !seat.available
+                        updateSeat(seat)
+                    } else {
+                        Toast.makeText(context, "Already taken", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                   Log.d(LOG_TAG, error.message)
+                }
+            })
+
             //if not
-            Toast.makeText(context, "Already taken", Toast.LENGTH_LONG).show()
+
         } else {
             //seat available, mark as unavailable
             seat.available = !seat.available
@@ -117,6 +140,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private fun updateSeat(seat: Seat) {
         val map = mutableMapOf<String, Any>()
         map["available"] = seat.available
+        map["lastUpdate"] = user.uid
         dbRef.getReference("seats").child(movieId.toString()).child(seat.number!!)
             .updateChildren(map)
     }
@@ -150,6 +174,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     }
 
 
+
+
     override fun onStart() {
         super.onStart()
         movieDetailsAdapter.startListening()
@@ -158,5 +184,26 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     override fun onDestroy() {
         super.onDestroy()
         movieDetailsAdapter.stopListening()
+    }
+
+    private fun getCurrentUser() = viewModel.getCurrentUser()
+
+    private fun checkAndAddUserToDb() {
+        dbRef.getReference("users").child(user.uid).addListenerForSingleValueEvent(object: ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if(snapshot.value === null) {
+                    Log.d(LOG_TAG, "No user in db, need to add")
+                    val userRef = dbRef.getReference("users").child(user.uid)
+                    userRef.child("email").setValue(user.email)
+                    Log.d(LOG_TAG, "User added")
+                } else {
+                    Log.d(LOG_TAG, "User already exists in db")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(LOG_TAG, error.message)
+            }
+        })
     }
 }

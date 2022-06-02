@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import ro.valentin.cinemania.domain.use_case.firebase_auth.FirebaseAuthUseCases
 import ro.valentin.cinemania.domain.use_case.firebase_database.FirebaseDatabaseUseCases
 import ro.valentin.cinemania.domain.use_case.movieDb.MovieDbUseCases
 import javax.inject.Inject
@@ -11,7 +12,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MovieDetailsViewModel @Inject constructor(
     private val movieDbUseCases: MovieDbUseCases,
-    private val firebaseDatabaseUseCases: FirebaseDatabaseUseCases
+    private val firebaseDatabaseUseCases: FirebaseDatabaseUseCases,
+    private val firebaseAuthUseCases: FirebaseAuthUseCases
 ) : ViewModel(){
 
     fun getMovieDetail(movieId: Int) = liveData(Dispatchers.IO) {
@@ -25,4 +27,6 @@ class MovieDetailsViewModel @Inject constructor(
             emit(it)
         }
     }
+
+    fun getCurrentUser() = firebaseAuthUseCases.getCurrentUser()
 }
