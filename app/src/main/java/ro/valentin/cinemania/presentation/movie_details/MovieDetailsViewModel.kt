@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import ro.valentin.cinemania.domain.use_case.firebase_auth.FirebaseAuthUseCases
 import ro.valentin.cinemania.domain.use_case.firebase_database.FirebaseDatabaseUseCases
 import ro.valentin.cinemania.domain.use_case.movieDb.MovieDbUseCases
@@ -29,4 +30,10 @@ class MovieDetailsViewModel @Inject constructor(
     }
 
     fun getCurrentUser() = firebaseAuthUseCases.getCurrentUser()
+
+    fun getSelectedSeatsByUser(movieId: Int, userId: String) = liveData(Dispatchers.IO) {
+        firebaseDatabaseUseCases.getSelectedSeatsByUser(movieId, userId).collect{
+            emit(it)
+        }
+    }
 }

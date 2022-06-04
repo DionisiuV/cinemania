@@ -27,6 +27,7 @@ import ro.valentin.cinemania.domain.repository.MovieDbRepository
 import ro.valentin.cinemania.domain.use_case.firebase_auth.*
 import ro.valentin.cinemania.domain.use_case.firebase_database.FirebaseDatabaseUseCases
 import ro.valentin.cinemania.domain.use_case.firebase_database.GetSeats
+import ro.valentin.cinemania.domain.use_case.firebase_database.GetSelectedSeatsByUser
 import ro.valentin.cinemania.domain.use_case.movieDb.GetMovieDetails
 import ro.valentin.cinemania.domain.use_case.movieDb.GetMovies
 import ro.valentin.cinemania.domain.use_case.movieDb.MovieDbUseCases
@@ -72,7 +73,8 @@ class AppModule {
     fun provideFirebaseDatabaseUseCases(
         firebaseDatabaseRepository: FirebaseDatabaseRepository
     ) : FirebaseDatabaseUseCases = FirebaseDatabaseUseCases(
-        getSeats = GetSeats(firebaseDatabaseRepository)
+        getSeats = GetSeats(firebaseDatabaseRepository),
+        getSelectedSeatsByUser = GetSelectedSeatsByUser(firebaseDatabaseRepository)
     )
 
     @Provides

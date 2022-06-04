@@ -5,9 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.database.FirebaseRecyclerOptions
@@ -36,6 +38,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private lateinit var seats: MutableList<Seat>
     private var movieId: Int? = 0
     private lateinit var user: FirebaseUser
+    private lateinit var nextButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,8 +56,9 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         seats = getSeats()
         movieId = getMovieIdFromIntent()
         user = getCurrentUser()!!
+        nextButton = view.findViewById(R.id.nextButton)
 
-        Log.d(LOG_TAG, user.email.toString())
+            Log.d(LOG_TAG, user.email.toString())
 
         //if currentUser does not exists in db add It
         checkAndAddUserToDb()
@@ -67,6 +71,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
 
         //find recyclerView and attach adapter
         setRecyclerView(view)
+
+        initNextButton()
     }
 
     private fun setRecyclerView(view: View) {
@@ -205,5 +211,43 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                 Log.d(LOG_TAG, error.message)
             }
         })
+    }
+
+    fun initNextButton() {
+        nextButton.setOnClickListener {
+            Log.d(LOG_TAG, "button clicked")
+            getSelectedSeatsByCurrentUser()
+        }
+    }
+
+    fun getSelectedSeatsByCurrentUser() {
+        if (view != null) {
+            movieId?.let { viewModel.getSelectedSeatsByUser(it, user.uid) }?.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                        //show progressBar
+                        Log.d(LOG_TAG, "getSeatDetails() request is loading")
+                    }
+                    is Response.Success -> {
+                        if (response.data.isNotEmpty()) {
+                            //hide progressBar
+                            Log.d(LOG_TAG, response.data.toString())
+                            //navigate to next fragment with data
+                            goToChooseDateTimeFragment(response.data)
+                        }
+                    }
+                    is Response.Error -> {
+                        //display error
+                        Log.d(LOG_TAG, response.error)
+                    }
+                }
+            }
+        }
+    }
+
+    fun goToChooseDateTimeFragment(listOfSelectedSeats: List<String>) {
+        val listOfSelectedSeatsBundle = Bundle()
+        listOfSelectedSeatsBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats))
+        findNavController().navigate(R.id.chooseDateTimeFragment, listOfSelectedSeatsBundle)
     }
 }

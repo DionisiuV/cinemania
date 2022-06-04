@@ -1,8 +1,11 @@
 package ro.valentin.cinemania.data.repository
 
+import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import ro.valentin.cinemania.core.Constants
 import ro.valentin.cinemania.domain.model.Response
 import ro.valentin.cinemania.domain.model.Seat
 import ro.valentin.cinemania.domain.repository.FirebaseDatabaseRepository
@@ -21,6 +24,27 @@ class FirebaseDatabaseRepositoryImpl @Inject constructor(
                     snapshot.getValue(Seat::class.java)
             }
             emit(Response.Success(seats))
+        } catch (e: Error) {
+            emit(Response.Error(e.message ?: e.toString()))
+        }
+    }
+
+    override suspend fun getSelectedSeatsByUser(
+        movieId: Int,
+        userId: String
+    ) = flow {
+        val seatsSelectedByUser = mutableListOf<String>()
+        try {
+            emit(Response.Loading)
+            val movieRef = firebaseDatabase.getReference("seats").child(movieId.toString())
+            movieRef.get().await().children.forEach { child ->
+                    val lastUpdateIdFromDb = child.child("lastUpdate").value.toString()
+                    if(userId == lastUpdateIdFromDb) {
+                        Log.d(Constants.LOG_TAG, child.child("number").value.toString())
+                        seatsSelectedByUser.add(child.child("number").value.toString())
+                }
+            }
+            emit(Response.Success(seatsSelectedByUser))
         } catch (e: Error) {
             emit(Response.Error(e.message ?: e.toString()))
         }

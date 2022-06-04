@@ -13,10 +13,7 @@ class MoviesAdapter(
     private val movieList: List<Movie>,
     private val onMovieClickListener: OnMovieClickListener,
     ) : RecyclerView.Adapter<MoviesAdapter.MovieViewHolder>() {
-/*    private lateinit var selectTimeAdapter: SelectTimeAdapter
-    private lateinit var selectTimeList: List<String>
-    private lateinit var selectTimeRecyclerView: RecyclerView
-    private lateinit var onSelectTimeClickListener: SelectTimeAdapter.OnSelectTimeClickListener*/
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -24,16 +21,7 @@ class MoviesAdapter(
 
 
 
-        //for testing
-        //idk where to initiate and set second recyclerview
-/*        selectTimeList = listOf(
-            "09:30",
-            "13:50",
-            "18:90"
-        )
-        selectTimeRecyclerView = dataBinding.timeRecyclerView
-        selectTimeAdapter = SelectTimeAdapter(selectTimeList, onSelectTimeClickListener)
-        selectTimeRecyclerView.adapter = selectTimeAdapter*/
+
 
 
 

@@ -9,6 +9,19 @@
         android:id="@+id/movieDetailsFragment"
         android:name="ro.valentin.cinemania.presentation.movie_details.MovieDetailsFragment"
         android:label="Choose seats"
-        tools:layout="@layout/fragment_movie_details" />
+        tools:layout="@layout/fragment_movie_details" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/chooseDateTimeFragment"
+        android:name="ro.valentin.cinemania.presentation.choose_date_time.ChooseDateTimeFragment"
+        android:label="Choose Date and Time"
+        tools:layout="@layout/fragment_choose_date_time" />
+
+    <fragment
+        android:id="@+id/orderDetailsFragment"
+        android:name="ro.valentin.cinemania.presentation.finish.FinishFragment"
+        android:label="Order Details"
+        tools:layout="@layout/fragment_finish" />
 
 </navigation>
