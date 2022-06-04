@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
@@ -79,6 +80,9 @@ class AppModule {
 
     @Provides
     fun provideFirebaseAuth() = Firebase.auth
+
+    @Provides
+    fun provideFirebaseFirestore() = Firebase.firestore
 
     @Provides
     fun provideOneTapClient(application: Application):

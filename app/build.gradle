@@ -68,6 +68,7 @@ dependencies {
     implementation "com.google.firebase:firebase-auth-ktx"
     implementation "com.google.firebase:firebase-firestore-ktx"
     implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
     // FirebaseUI for Firebase Realtime Database
     implementation 'com.firebaseui:firebase-ui-database:8.0.1'
     //Google play services

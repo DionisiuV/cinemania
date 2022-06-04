@@ -65,7 +65,6 @@ class MoviesFragment : Fragment(R.layout.fragment_movies), MoviesAdapter.OnMovie
     }
 
     override fun onMovieClick(movie: Movie) {
-        Toast.makeText(context, movie.title, Toast.LENGTH_SHORT).show()
         goToSplashActivity(movie.id)
     }
 
