@@ -46,7 +46,7 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
         initNextButton(view)
     }
 
-    fun initSelectTimeRecyclerView(view: View) {
+    private fun initSelectTimeRecyclerView(view: View) {
         selectTimeList = listOf(
             AvailableHour("09:30"),
             AvailableHour("13:50"),
@@ -79,7 +79,7 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
         selectTimeRecyclerView.adapter = selectTimeAdapter
     }
 
-    fun initDatePicker(view: View) {
+    private fun initDatePicker(view: View) {
         val datePicker = view.findViewById<DatePicker>(R.id.datePicker)
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = System.currentTimeMillis()
@@ -96,14 +96,14 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
 
             })
     }
-    fun pickSelectedDate(date: String) {
+    private fun pickSelectedDate(date: String) {
         selectedInformation["date"] = date
     }
     fun pickSelectedHour(hour: String) {
         selectedInformation["hour"] = hour
     }
 
-    fun getSelectedInformation() {
+    private fun getSelectedInformation() {
         if(selectedInformation.containsKey("date") && selectedInformation.containsKey("hour")) {
             Log.d(LOG_TAG, selectedInformation.toString())
             goToFinishFragment()
@@ -114,19 +114,21 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
 
     }
 
-    fun initNextButton(view: View) {
+    private fun initNextButton(view: View) {
         nextButton = view.findViewById(R.id.nextButton)
         nextButton.setOnClickListener {
             getSelectedInformation()
         }
     }
 
-    fun getListOfSelectedSeatsFromBundle(): List<String>? = arguments?.getStringArrayList("listOfSelectedSeats")
+    private fun getListOfSelectedSeatsFromBundle(): List<String>? = arguments?.getStringArrayList("listOfSelectedSeats")
+    private fun getMovieTitleFromBundle(): String? = arguments?.getString("movieTitle")
 
-    fun goToFinishFragment() {
+    private fun goToFinishFragment() {
             val listOfSelectedInformationBundle = Bundle()
             listOfSelectedInformationBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats as MutableList))
             listOfSelectedInformationBundle.putSerializable("selectedInformation", selectedInformation)
+            listOfSelectedInformationBundle.putString("movieTitle", getMovieTitleFromBundle())
 
         Log.d(LOG_TAG, "Go to FinishFragment")
         Log.d(LOG_TAG, listOfSelectedSeats.toString())

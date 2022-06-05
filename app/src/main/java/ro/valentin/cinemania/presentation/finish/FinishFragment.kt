@@ -1,11 +1,13 @@
 package ro.valentin.cinemania.presentation.finish
 
 import android.content.ContentValues.TAG
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.firebase.auth.FirebaseUser
@@ -13,6 +15,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants.LOG_TAG
+import ro.valentin.cinemania.presentation.main.MainActivity
+import ro.valentin.cinemania.presentation.movie_details.MovieDetailsActivity
 import ro.valentin.cinemania.presentation.movie_details.MovieDetailsViewModel
 import java.util.*
 import javax.inject.Inject
@@ -24,6 +28,7 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
     private val viewModel by viewModels<MovieDetailsViewModel>()
     private lateinit var selectedDate: String
     private lateinit var selectedTime: String
+    private lateinit var movieTitle: String
     private lateinit var user: FirebaseUser
     @Inject
     lateinit var firebaseFirestore: FirebaseFirestore
@@ -37,41 +42,39 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
         setTextView(view)
     }
 
-    fun getInformationFromBundle() {
+    private fun getInformationFromBundle() {
         arguments?.let {
             val selectedInfo = it.getSerializable("selectedInformation") as HashMap<String, String>
             selectedSeats = it.getStringArrayList("listOfSelectedSeats")
+            movieTitle = it.getString("movieTitle").toString()
             selectedDate = selectedInfo["date"].toString()
             selectedTime = selectedInfo["hour"].toString()
         }
     }
 
-    fun initFinishButton(view: View) {
+    private fun initFinishButton(view: View) {
         val finishButton = view.findViewById<Button>(R.id.finishButton)
 
         finishButton.setOnClickListener {
-            Log.d(LOG_TAG, selectedSeats.toString())
-            Log.d(LOG_TAG, selectedDate.toString())
-            Log.d(LOG_TAG, selectedTime.toString())
-            Log.d(LOG_TAG, user.email.toString())
             addRecordToFirestore()
-
+            goToMovieDetails()
         }
     }
 
-    fun setTextView(view: View) {
+    private fun setTextView(view: View) {
         view.findViewById<TextView>(R.id.dateAndTimeTextView).text = "Selected Date: $selectedDate\nSelected Time: $selectedTime"
         view.findViewById<TextView>(R.id.seatsTextView).text = "Selected seats: ${selectedSeats?.joinToString()}"
+        view.findViewById<TextView>(R.id.movieTitleTextView).text = "Movie title: $movieTitle"
     }
 
     private fun getCurrentUser() = viewModel.getCurrentUser()
 
-    fun addRecordToFirestore() {
+    private fun addRecordToFirestore() {
         val mail: MutableMap<String, Any> = HashMap()
         mail["to"] = Arrays.asList(user.email.toString())
         val message: MutableMap<String, Any> = HashMap()
         message["subject"] = "Cinemania - Order Details"
-        message["html"] = "Selected date: ${selectedDate}<br> Selected time: ${selectedTime}<br> Selected seats: ${selectedSeats}"
+        message["html"] = "Movie title: ${movieTitle}<br>Selected date: ${selectedDate}<br> Selected time: ${selectedTime}<br> Selected seats: ${selectedSeats}<br><br><br>*You will pay 7$ for each selected seat."
         mail["message"] = message
 
         firebaseFirestore.collection("mail")
@@ -82,5 +85,13 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
             .addOnFailureListener { e ->
                 Log.w(LOG_TAG, "Error adding document", e)
             }
+    }
+
+    private fun goToMovieDetails() {
+        val movieDetailsIntent = Intent(context, MainActivity::class.java)
+
+        Toast.makeText(context, "Success - Your order has been placed!", Toast.LENGTH_LONG).show()
+
+        startActivity(movieDetailsIntent)
     }
 }

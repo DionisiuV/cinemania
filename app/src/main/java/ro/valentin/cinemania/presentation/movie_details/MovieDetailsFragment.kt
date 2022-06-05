@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -20,8 +21,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import ro.valentin.cinemania.BR
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants.LOG_TAG
+import ro.valentin.cinemania.core.Utils.Companion.hide
+import ro.valentin.cinemania.core.Utils.Companion.show
 import ro.valentin.cinemania.data.network.dto.toMovie
 import ro.valentin.cinemania.databinding.MovieDetailsDataBinding
+import ro.valentin.cinemania.domain.model.Movie
 import ro.valentin.cinemania.domain.model.Response
 import ro.valentin.cinemania.domain.model.Seat
 import ro.valentin.cinemania.domain.model.getSeats
@@ -39,6 +43,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private var movieId: Int? = 0
     private lateinit var user: FirebaseUser
     private lateinit var nextButton: Button
+    private lateinit var loaderProgressBar: ProgressBar
+    private lateinit var movie: Movie
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,6 +66,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
 
             Log.d(LOG_TAG, user.email.toString())
 
+        initProgressBar(view)
+
         //if currentUser does not exists in db add It
         checkAndAddUserToDb()
 
@@ -73,6 +81,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         setRecyclerView(view)
 
         initNextButton()
+
     }
 
     private fun setRecyclerView(view: View) {
@@ -96,11 +105,14 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
             viewModel.getMovieDetail(movieId).observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
+                        loaderProgressBar.show()
                         Log.d(LOG_TAG, "movie data is loading")
                     }
                     is Response.Success -> {
-                        val movie = response.data.toMovie()
+                        movie = response.data.toMovie()
                         dataBinding.setVariable(BR.movie, movie)
+                        loaderProgressBar.hide()
+
                     }
                     is Response.Error -> Log.d(LOG_TAG, response.error)
                 }
@@ -158,6 +170,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                     is Response.Loading -> {
                         //show progressBar
                         Log.d(LOG_TAG, "getSeatDetails() request is loading")
+                        loaderProgressBar.show()
                     }
                     is Response.Success -> {
                         if (response.data.isNotEmpty()) {
@@ -168,6 +181,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                             dbRef.getReference("seats").child(movieId.toString()).setValue(seats)
                             Log.d(LOG_TAG, "data pushed")
                             //hide progressBar
+                            loaderProgressBar.hide()
                         }
                     }
                     is Response.Error -> {
@@ -227,6 +241,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                     is Response.Loading -> {
                         //show progressBar
                         Log.d(LOG_TAG, "getSeatDetails() request is loading")
+
+                        loaderProgressBar.show()
                     }
                     is Response.Success -> {
                         if (response.data.isNotEmpty()) {
@@ -234,6 +250,8 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                             Log.d(LOG_TAG, response.data.toString())
                             //navigate to next fragment with data
                             goToChooseDateTimeFragment(response.data)
+
+                            loaderProgressBar.hide()
                         }
                     }
                     is Response.Error -> {
@@ -248,6 +266,11 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     fun goToChooseDateTimeFragment(listOfSelectedSeats: List<String>) {
         val listOfSelectedSeatsBundle = Bundle()
         listOfSelectedSeatsBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats))
+        listOfSelectedSeatsBundle.putString("movieTitle", movie.title)
         findNavController().navigate(R.id.chooseDateTimeFragment, listOfSelectedSeatsBundle)
+    }
+
+    private fun initProgressBar(view: View) {
+        loaderProgressBar = view.findViewById(R.id.loadingProgressBar)
     }
 }

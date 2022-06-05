@@ -39,7 +39,8 @@ class FirebaseDatabaseRepositoryImpl @Inject constructor(
             val movieRef = firebaseDatabase.getReference("seats").child(movieId.toString())
             movieRef.get().await().children.forEach { child ->
                     val lastUpdateIdFromDb = child.child("lastUpdate").value.toString()
-                    if(userId == lastUpdateIdFromDb) {
+                     val isAvailable = child.child("available").value.toString()
+                    if(userId == lastUpdateIdFromDb && isAvailable == "false") {
                         Log.d(Constants.LOG_TAG, child.child("number").value.toString())
                         seatsSelectedByUser.add(child.child("number").value.toString())
                 }
