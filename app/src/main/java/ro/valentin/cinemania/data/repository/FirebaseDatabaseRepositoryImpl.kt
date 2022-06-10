@@ -16,11 +16,15 @@ class FirebaseDatabaseRepositoryImpl @Inject constructor(
     private val firebaseDatabase: FirebaseDatabase
 ) : FirebaseDatabaseRepository{
 
-    override suspend fun getSeats(movieId: Int)  = flow {
+    override suspend fun getSeats(movieId: Int,
+                                  selectedLocation: String,
+                                  selectedDate: String,
+                                  selectedTime: String
+    )  = flow {
         try {
             emit(Response.Loading)
-            val seatsRef = firebaseDatabase.getReference("seats")
-            val seats = seatsRef.child(movieId.toString()).get().await().children.map { snapshot ->
+            val seatsRef = firebaseDatabase.getReference("movies").child(movieId.toString()).child(selectedLocation).child(selectedDate).child(selectedTime).child("seats")
+            val seats = seatsRef.get().await().children.map { snapshot ->
                     snapshot.getValue(Seat::class.java)
             }
             emit(Response.Success(seats))
@@ -31,12 +35,16 @@ class FirebaseDatabaseRepositoryImpl @Inject constructor(
 
     override suspend fun getSelectedSeatsByUser(
         movieId: Int,
+        selectedLocation: String,
+        selectedDate: String,
+        selectedTime: String,
         userId: String
     ) = flow {
         val seatsSelectedByUser = mutableListOf<String>()
         try {
             emit(Response.Loading)
-            val movieRef = firebaseDatabase.getReference("seats").child(movieId.toString())
+
+            val movieRef = firebaseDatabase.getReference("movies").child(movieId.toString()).child(selectedLocation).child(selectedDate).child(selectedTime).child("seats")
             movieRef.get().await().children.forEach { child ->
                     val lastUpdateIdFromDb = child.child("lastUpdate").value.toString()
                      val isAvailable = child.child("available").value.toString()

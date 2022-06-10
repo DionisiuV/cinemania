@@ -3,7 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/movieDetailsFragment">
+    app:startDestination="@id/chooseLocationFragment">
+
+    <fragment
+        android:id="@+id/chooseLocationFragment"
+        android:name="ro.valentin.cinemania.presentation.choose_location.ChooseLocationFragment"
+        android:label="Choose Location"
+        tools:layout="@layout/fragment_choose_location" />
+
+    <fragment
+        android:id="@+id/chooseDateTimeFragment"
+        android:name="ro.valentin.cinemania.presentation.choose_date_time.ChooseDateTimeFragment"
+        android:label="Choose Date and Time"
+        tools:layout="@layout/fragment_choose_date_time" />
 
     <fragment
         android:id="@+id/movieDetailsFragment"
@@ -11,12 +23,6 @@
         android:label="Choose seats"
         tools:layout="@layout/fragment_movie_details" >
     </fragment>
-
-    <fragment
-        android:id="@+id/chooseDateTimeFragment"
-        android:name="ro.valentin.cinemania.presentation.choose_date_time.ChooseDateTimeFragment"
-        android:label="Choose Date and Time"
-        tools:layout="@layout/fragment_choose_date_time" />
 
     <fragment
         android:id="@+id/orderDetailsFragment"

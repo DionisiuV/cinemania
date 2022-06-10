@@ -3,6 +3,7 @@ package ro.valentin.cinemania.core
 object Constants {
     const val LOG_TAG="LogTag"
     const val SIGN_IN_ERROR_MSG="16: Cannot find a matching credential."
+    const val SIGN_IN_ERROR_MSG_2="Missing Feature{name=auth_api_credentials_begin_sign_in, version=6}"
     const val BASE_URL = "https://api.themoviedb.org/3/"
     const val NOW_PLAYING_URI = "movie/now_playing"
     const val MOVIE_DETAILS_URI ="movie"

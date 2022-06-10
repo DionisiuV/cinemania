@@ -7,5 +7,11 @@ class GetSelectedSeatsByUser @Inject constructor(
     private val firebaseDatabaseRepository: FirebaseDatabaseRepository
 ){
 
-    suspend operator fun invoke(movieId: Int, userId: String) = firebaseDatabaseRepository.getSelectedSeatsByUser(movieId, userId)
+    suspend operator fun invoke(
+        movieId: Int,
+        selectedLocation: String,
+        selectedDate: String, 
+        selectedTime: String,
+        userId: String
+    ) = firebaseDatabaseRepository.getSelectedSeatsByUser(movieId, selectedLocation, selectedDate, selectedTime, userId)
 }

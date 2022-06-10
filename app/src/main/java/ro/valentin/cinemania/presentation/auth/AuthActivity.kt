@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +24,7 @@ import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants
 import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.core.Constants.SIGN_IN_ERROR_MSG
+import ro.valentin.cinemania.core.Constants.SIGN_IN_ERROR_MSG_2
 import ro.valentin.cinemania.core.Utils.Companion.hide
 import ro.valentin.cinemania.core.Utils.Companion.show
 import ro.valentin.cinemania.domain.model.Response
@@ -93,6 +95,8 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                     loaderProgressBar.hide()
                     if(response.error == SIGN_IN_ERROR_MSG) {
                         oneTapSignUpWithGoogle()
+                    } else if(response.error == SIGN_IN_ERROR_MSG_2) {
+                            findViewById<TextView>(R.id.errorMsgTextView).visibility = View.VISIBLE
                     }
 
                     Log.d(LOG_TAG, "oneTapSignInWithGoogle() error ${response.error}")
@@ -121,6 +125,10 @@ class AuthActivity : AppCompatActivity(R.layout.activity_auth) {
                 }
                 is Response.Error -> {
                     loaderProgressBar.hide()
+
+                    if(response.error == SIGN_IN_ERROR_MSG) {
+                        findViewById<TextView>(R.id.errorMsgTextView).visibility = View.VISIBLE
+                    }
 
                     Log.d(LOG_TAG, "oneTapSignUpWithGoogle() error ${response.error}")
                 }

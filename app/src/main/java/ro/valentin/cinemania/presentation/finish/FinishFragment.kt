@@ -28,6 +28,7 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
     private val viewModel by viewModels<MovieDetailsViewModel>()
     private lateinit var selectedDate: String
     private lateinit var selectedTime: String
+    private lateinit var selectedLocation: String
     private lateinit var movieTitle: String
     private lateinit var user: FirebaseUser
     @Inject
@@ -49,6 +50,7 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
             movieTitle = it.getString("movieTitle").toString()
             selectedDate = selectedInfo["date"].toString()
             selectedTime = selectedInfo["hour"].toString()
+            selectedLocation = it.getString("selectedLocation").toString()
         }
     }
 
@@ -62,9 +64,10 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
     }
 
     private fun setTextView(view: View) {
+        view.findViewById<TextView>(R.id.locationTextView).text = "Selected Location: $selectedLocation"
         view.findViewById<TextView>(R.id.dateAndTimeTextView).text = "Selected Date: $selectedDate\nSelected Time: $selectedTime"
-        view.findViewById<TextView>(R.id.seatsTextView).text = "Selected seats: ${selectedSeats?.joinToString()}"
         view.findViewById<TextView>(R.id.movieTitleTextView).text = "Movie title: $movieTitle"
+        view.findViewById<TextView>(R.id.seatsTextView).text = "Selected seats: ${selectedSeats?.joinToString(", ")}"
     }
 
     private fun getCurrentUser() = viewModel.getCurrentUser()
@@ -74,7 +77,10 @@ class FinishFragment : Fragment(R.layout.fragment_finish) {
         mail["to"] = Arrays.asList(user.email.toString())
         val message: MutableMap<String, Any> = HashMap()
         message["subject"] = "Cinemania - Order Details"
-        message["html"] = "Movie title: ${movieTitle}<br>Selected date: ${selectedDate}<br> Selected time: ${selectedTime}<br> Selected seats: ${selectedSeats}<br><br><br>*You will pay 7$ for each selected seat."
+        message["html"] = "Thanks for choosing Cinema ${selectedLocation}<br>" +
+                "We are waiting for you at the movie ${movieTitle} on ${selectedDate} at ${selectedTime}<br> " +
+                "Your selected seats: ${selectedSeats?.joinToString(", ")}<br><br><br>" +
+                "*You will pay 7$ for each selected seat."
         mail["message"] = message
 
         firebaseFirestore.collection("mail")

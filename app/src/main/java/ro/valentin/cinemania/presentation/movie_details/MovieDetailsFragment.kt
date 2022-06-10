@@ -1,6 +1,7 @@
 package ro.valentin.cinemania.presentation.movie_details
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -37,6 +38,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private val viewModel by viewModels<MovieDetailsViewModel>()
     @Inject
     lateinit var dbRef: FirebaseDatabase
+    private lateinit var firebaseMovieRef: DatabaseReference
     private lateinit var dataBinding: MovieDetailsDataBinding
     private lateinit var movieDetailsAdapter: MovieDetailsAdapter
     private lateinit var seats: MutableList<Seat>
@@ -45,6 +47,10 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     private lateinit var nextButton: Button
     private lateinit var loaderProgressBar: ProgressBar
     private lateinit var movie: Movie
+    private lateinit var selectedInformation: HashMap<String, String>
+    private lateinit var selectedDate: String
+    private lateinit var selectedTime: String
+    private lateinit var selectedLocation: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +59,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
     ): View {
         dataBinding = MovieDetailsDataBinding.inflate(inflater, container, false)
 
+        dataBinding.descriptionTextView.movementMethod = ScrollingMovementMethod()
 
         return dataBinding.root
     }
@@ -61,12 +68,18 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         super.onViewCreated(view, savedInstanceState)
         seats = getSeats()
         movieId = getMovieIdFromIntent()
-        user = getCurrentUser()!!
+         user = getCurrentUser()!!
         nextButton = view.findViewById(R.id.nextButton)
+        getInformationFromBundle()
 
-            Log.d(LOG_TAG, user.email.toString())
 
+
+        firebaseMovieRef = dbRef.getReference("movies").child(movieId.toString()).child(selectedLocation).child(selectedDate).child(selectedTime).child("seats")
         initProgressBar(view)
+
+        //alegere cinema
+        //ecran alegere ora/data inainte de a alege locurile -> DONE
+        //serviciu de simulare plata -> https://github.com/gjyoung1974/vgs-cardform-demo
 
         //if currentUser does not exists in db add It
         checkAndAddUserToDb()
@@ -82,11 +95,12 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
 
         initNextButton()
 
+
     }
 
     private fun setRecyclerView(view: View) {
         val movieDetailsRecyclerView: RecyclerView = view.findViewById(R.id.seatsRecyclerView)
-        val query: Query = dbRef.getReference("seats").child(movieId.toString())
+        val query: Query = firebaseMovieRef
         val firebaseRecyclerOptions: FirebaseRecyclerOptions<Seat> =
             FirebaseRecyclerOptions.Builder<Seat>()
                 .setQuery(query, Seat::class.java)
@@ -105,14 +119,11 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
             viewModel.getMovieDetail(movieId).observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
-                        loaderProgressBar.show()
                         Log.d(LOG_TAG, "movie data is loading")
                     }
                     is Response.Success -> {
                         movie = response.data.toMovie()
                         dataBinding.setVariable(BR.movie, movie)
-                        loaderProgressBar.hide()
-
                     }
                     is Response.Error -> Log.d(LOG_TAG, response.error)
                 }
@@ -128,7 +139,7 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
             //seat unavailable, check if lastUpdate field from DB == currentUser id
             //if yes, mark as available
             Log.d(LOG_TAG, "onSeatClick() ${user.uid}")
-            dbRef.getReference("seats").child(movieId.toString()).child(seat.number.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
+            firebaseMovieRef.child(seat.number.toString()).addListenerForSingleValueEvent(object: ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
 
                     val lastUpdateIdFromDb = snapshot.child("lastUpdate").value.toString()
@@ -159,13 +170,13 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         val map = mutableMapOf<String, Any>()
         map["available"] = seat.available
         map["lastUpdate"] = user.uid
-        dbRef.getReference("seats").child(movieId.toString()).child(seat.number!!)
+        firebaseMovieRef.child(seat.number!!)
             .updateChildren(map)
     }
 
     private fun fetchSeatsDetails() {
         if (view != null) {
-            movieId?.let { viewModel.getSeats(it) }?.observe(viewLifecycleOwner) { response ->
+            movieId?.let { viewModel.getSeats(it, selectedLocation, selectedDate, selectedTime) }?.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
                         //show progressBar
@@ -176,9 +187,10 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
                         if (response.data.isNotEmpty()) {
                             //hide progressBar
                             Log.d(LOG_TAG, "data is there")
+                            loaderProgressBar.hide()
                         } else {
                             Log.d(LOG_TAG, "data is not there, need to push it")
-                            dbRef.getReference("seats").child(movieId.toString()).setValue(seats)
+                            firebaseMovieRef.setValue(seats)
                             Log.d(LOG_TAG, "data pushed")
                             //hide progressBar
                             loaderProgressBar.hide()
@@ -234,24 +246,23 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         }
     }
 
-    fun getSelectedSeatsByCurrentUser() {
+    private fun getSelectedSeatsByCurrentUser() {
         if (view != null) {
-            movieId?.let { viewModel.getSelectedSeatsByUser(it, user.uid) }?.observe(viewLifecycleOwner) { response ->
+            movieId?.let { viewModel.getSelectedSeatsByUser(it, selectedLocation, selectedDate, selectedTime, user.uid) }?.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
                         //show progressBar
-                        Log.d(LOG_TAG, "getSeatDetails() request is loading")
+                        Log.d(LOG_TAG, "getSelectedSeatsByCurrentUser() request is loading")
 
-                        loaderProgressBar.show()
                     }
                     is Response.Success -> {
                         if (response.data.isNotEmpty()) {
                             //hide progressBar
                             Log.d(LOG_TAG, response.data.toString())
                             //navigate to next fragment with data
-                            goToChooseDateTimeFragment(response.data)
-
-                            loaderProgressBar.hide()
+                            goToFinishFragment(response.data)
+                        } else {
+                            Toast.makeText(context, "You must selected at least one seat", Toast.LENGTH_SHORT).show()
                         }
                     }
                     is Response.Error -> {
@@ -263,14 +274,27 @@ class MovieDetailsFragment : Fragment(R.layout.fragment_movie_details),
         }
     }
 
-    fun goToChooseDateTimeFragment(listOfSelectedSeats: List<String>) {
-        val listOfSelectedSeatsBundle = Bundle()
-        listOfSelectedSeatsBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats))
-        listOfSelectedSeatsBundle.putString("movieTitle", movie.title)
-        findNavController().navigate(R.id.chooseDateTimeFragment, listOfSelectedSeatsBundle)
+    private fun goToFinishFragment(listOfSelectedSeats: List<String>) {
+        val listOfSelectedInformationBundle = Bundle()
+        listOfSelectedInformationBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats))
+        listOfSelectedInformationBundle.putSerializable("selectedInformation", selectedInformation)
+        listOfSelectedInformationBundle.putString("movieTitle", movie.title)
+        listOfSelectedInformationBundle.putString("selectedLocation", selectedLocation)
+
+        Log.d(LOG_TAG, "Go to FinishFragment")
+
+        findNavController().navigate(R.id.orderDetailsFragment, listOfSelectedInformationBundle)
     }
 
     private fun initProgressBar(view: View) {
         loaderProgressBar = view.findViewById(R.id.loadingProgressBar)
     }
+
+    private fun getInformationFromBundle() = arguments?.let {
+            selectedInformation = it.getSerializable("selectedInformation") as HashMap<String, String>
+            selectedDate = selectedInformation["date"].toString()
+            selectedTime = selectedInformation["hour"].toString()
+            selectedLocation = it.getString("selectedLocation").toString()
+        }
+
 }

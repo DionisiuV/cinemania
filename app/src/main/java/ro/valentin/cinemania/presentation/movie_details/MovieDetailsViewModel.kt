@@ -23,16 +23,27 @@ class MovieDetailsViewModel @Inject constructor(
         }
     }
 
-    fun getSeats(movieId: Int) = liveData(Dispatchers.IO) {
-        firebaseDatabaseUseCases.getSeats(movieId).collect {
+    fun getSeats(
+        movieId: Int,
+        selectedLocation: String,
+        selectedDate: String,
+        selectedTime: String
+    ) = liveData(Dispatchers.IO) {
+        firebaseDatabaseUseCases.getSeats(movieId, selectedLocation, selectedDate, selectedTime).collect {
             emit(it)
         }
     }
 
     fun getCurrentUser() = firebaseAuthUseCases.getCurrentUser()
 
-    fun getSelectedSeatsByUser(movieId: Int, userId: String) = liveData(Dispatchers.IO) {
-        firebaseDatabaseUseCases.getSelectedSeatsByUser(movieId, userId).collect{
+    fun getSelectedSeatsByUser(
+        movieId: Int,
+        selectedLocation: String,
+        selectedDate: String,
+        selectedTime: String,
+        userId: String
+    ) = liveData(Dispatchers.IO) {
+        firebaseDatabaseUseCases.getSelectedSeatsByUser(movieId, selectedLocation, selectedDate, selectedTime, userId).collect{
             emit(it)
         }
     }

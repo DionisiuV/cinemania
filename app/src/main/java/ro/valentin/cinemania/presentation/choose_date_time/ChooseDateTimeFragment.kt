@@ -1,5 +1,6 @@
 package ro.valentin.cinemania.presentation.choose_date_time
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,37 +15,30 @@ import androidx.recyclerview.widget.RecyclerView
 import ro.valentin.cinemania.R
 import ro.valentin.cinemania.core.Constants.LOG_TAG
 import ro.valentin.cinemania.domain.model.AvailableHour
+import ro.valentin.cinemania.presentation.movie_details.MovieDetailsActivity
 import java.time.Month
 import java.time.format.TextStyle
 import java.util.*
-import kotlin.collections.HashMap
 
 class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
-    var listOfSelectedSeats: List<String>? = null
     private lateinit var nextButton: Button
     private lateinit var selectTimeAdapter: SelectTimeAdapter
     private lateinit var selectTimeList: List<AvailableHour>
     private lateinit var selectTimeRecyclerView: RecyclerView
     private lateinit var selectedInformation: HashMap<String, String>
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        selectedInformation = hashMapOf()
-        listOfSelectedSeats = getListOfSelectedSeatsFromBundle()
-        return super.onCreateView(inflater, container, savedInstanceState)
-    }
+    private lateinit var selectedLocation: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        selectedInformation = hashMapOf()
 
         initSelectTimeRecyclerView(view)
         initDatePicker(view)
         initNextButton(view)
+
+        getSelectedLocationFromBundle()
     }
+
 
     private fun initSelectTimeRecyclerView(view: View) {
         selectTimeList = listOf(
@@ -106,7 +100,7 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
     private fun getSelectedInformation() {
         if(selectedInformation.containsKey("date") && selectedInformation.containsKey("hour")) {
             Log.d(LOG_TAG, selectedInformation.toString())
-            goToFinishFragment()
+            goToMovieDetailsFragment()
         } else {
             Log.d(LOG_TAG, "Not enough information")
 
@@ -121,17 +115,19 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
         }
     }
 
-    private fun getListOfSelectedSeatsFromBundle(): List<String>? = arguments?.getStringArrayList("listOfSelectedSeats")
-    private fun getMovieTitleFromBundle(): String? = arguments?.getString("movieTitle")
+    private fun getSelectedLocationFromBundle() {
+        arguments?.let {
+            selectedLocation = it.getString("selectedLocation").toString()
+        }
+    }
 
-    private fun goToFinishFragment() {
-            val listOfSelectedInformationBundle = Bundle()
-            listOfSelectedInformationBundle.putStringArrayList("listOfSelectedSeats", ArrayList(listOfSelectedSeats as MutableList))
-            listOfSelectedInformationBundle.putSerializable("selectedInformation", selectedInformation)
-            listOfSelectedInformationBundle.putString("movieTitle", getMovieTitleFromBundle())
+    private fun goToMovieDetailsFragment() {
+        val listOfSelectedInformationBundle = Bundle()
+        listOfSelectedInformationBundle.putSerializable("selectedInformation", selectedInformation)
+        listOfSelectedInformationBundle.putString("selectedLocation", selectedLocation)
 
-        Log.d(LOG_TAG, "Go to FinishFragment")
-        Log.d(LOG_TAG, listOfSelectedSeats.toString())
-            findNavController().navigate(R.id.orderDetailsFragment, listOfSelectedInformationBundle)
+        Log.d(LOG_TAG, selectedInformation.toString())
+        Log.d(LOG_TAG, "Go to MovieDetailsFragment")
+        findNavController().navigate(R.id.movieDetailsFragment, listOfSelectedInformationBundle)
     }
 }
