@@ -26,12 +26,14 @@
 
             <TextView
                 android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{movie.title}"
-                android:textColor="@color/black"
-                android:textFontWeight="700"
+                android:textColor="@color/white"
+                android:background="#66000000"
+                android:gravity="center"
                 android:textSize="32sp"
+                android:padding="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/posterImageView"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -134,6 +136,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="8dp"
+                android:textSize="16sp"
                 />
 
             <ProgressBar

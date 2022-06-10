@@ -42,9 +42,11 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
 
     private fun initSelectTimeRecyclerView(view: View) {
         selectTimeList = listOf(
-            AvailableHour("09:30"),
-            AvailableHour("13:50"),
-            AvailableHour("18:00"),
+            AvailableHour("11:20"),
+            AvailableHour("14:10"),
+            AvailableHour("17:00"),
+            AvailableHour("19:45"),
+            AvailableHour("22:45"),
         )
         selectTimeRecyclerView = view.findViewById(R.id.timeRecyclerView)
         var lastSelected = ""
@@ -103,7 +105,7 @@ class ChooseDateTimeFragment : Fragment(R.layout.fragment_choose_date_time) {
             goToMovieDetailsFragment()
         } else {
             Log.d(LOG_TAG, "Not enough information")
-
+            Toast.makeText(context, "You must select date and time", Toast.LENGTH_SHORT).show()
         }
 
     }
